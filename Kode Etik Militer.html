@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOSIR TERKLASIFIKASI — KODE ETIK 0.0.6 / 0.6.9</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=JetBrains+Mono:wght@300;400;500;700&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-0: #07090b;
+  --bg-1: #0d1014;
+  --bg-2: #14181d;
+  --ink: #d8d4c5;
+  --ink-dim: #7c7869;
+  --amber: #ffb400;
+  --amber-hot: #ff8c00;
+  --red: #ff2d2d;
+  --green: #00ff88;
+  --border: rgba(255, 180, 0, 0.18);
+}
+* { box-sizing: border-box; }
+html, body {
+  background: var(--bg-0);
+  color: var(--ink);
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0;
+  overflow-x: hidden;
+}
+body {
+  background-image:
+    linear-gradient(rgba(255,180,0,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,180,0,0.025) 1px, transparent 1px),
+    radial-gradient(ellipse at 20% 10%, rgba(255,140,0,0.06), transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(255,45,45,0.05), transparent 50%);
+  background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%;
+}
+.font-display { font-family: 'Black Ops One', sans-serif; letter-spacing: 0.04em; }
+.font-oswald { font-family: 'Oswald', sans-serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* scanlines + vignette */
+.scanlines::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.09) 3px, rgba(0,0,0,0) 4px);
+  z-index: 100; mix-blend-mode: multiply;
+}
+.scanlines::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+  z-index: 99;
+}
+.noise {
+  position: fixed; inset: 0; pointer-events: none; opacity: 0.05; z-index: 98;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* corner brackets */
+.corner-brackets { position: relative; }
+.corner-brackets::before, .corner-brackets::after {
+  content: ''; position: absolute; width: 18px; height: 18px;
+  border-color: var(--amber); border-style: solid;
+}
+.corner-brackets::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.corner-brackets::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+@keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+.blink { animation: blink 1.2s steps(2) infinite; }
+
+@keyframes pulse-warn {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 45, 45, 0.6); }
+  50% { box-shadow: 0 0 0 12px rgba(255, 45, 45, 0); }
+}
+.pulse-warn { animation: pulse-warn 2s ease-out infinite; }
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  41% { opacity: 1; } 42% { opacity: 0.55; } 43% { opacity: 1; }
+  91% { opacity: 0.82; } 92% { opacity: 1; }
+}
+.flicker { animation: flicker 5s infinite; }
+
+@keyframes scan-y { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
+.scan-bar {
+  position: fixed; left: 0; right: 0; height: 80px;
+  background: linear-gradient(to bottom, transparent, rgba(255,180,0,0.05), transparent);
+  animation: scan-y 9s linear infinite; pointer-events: none; z-index: 97;
+}
+
+.classified-bar {
+  background: repeating-linear-gradient(45deg, #c8941a 0, #c8941a 14px, #1a1407 14px, #1a1407 28px);
+}
+
+.article {
+  position: relative;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  border: 1px solid var(--border);
+  transition: all 0.35s ease;
+  overflow: hidden;
+}
+.article::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%; background: var(--amber);
+  transform: scaleY(0); transform-origin: top; transition: transform 0.35s ease;
+}
+.article:hover { border-color: var(--amber); transform: translateX(4px); }
+.article:hover::before { transform: scaleY(1); }
+.article.red::before { background: var(--red); }
+.article.red:hover { border-color: var(--red); }
+.article::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 30px; height: 30px;
+  background: linear-gradient(225deg, rgba(255,180,0,0.15) 0%, transparent 50%);
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.article:hover::after { opacity: 1; }
+
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(-1px, -1px); }
+  60% { transform: translate(1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+}
+.glitch:hover { animation: glitch 0.3s infinite; }
+
+@keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.radar-sweep { animation: radar-sweep 6s linear infinite; transform-origin: center; }
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+.ring-pulse { animation: ring-pulse 3s ease-in-out infinite; }
+
+.row-hover:hover { background: rgba(255, 180, 0, 0.04); }
+
+.stamp {
+  border: 2px solid var(--red);
+  color: var(--red);
+  transform: rotate(-8deg);
+  opacity: 0.85;
+  filter: drop-shadow(0 0 1px rgba(255,45,45,0.5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body class="scanlines">
+<div class="noise"></div>
+<div class="scan-bar"></div>
+
+<!-- Top classification banner -->
+<div class="classified-bar text-black text-center py-1.5 font-mono text-xs font-bold tracking-widest flicker">
+  ⚠ RAHASIA — TERKLASIFIKASI — TIDAK UNTUK DISTRIBUSI UMUM ⚠
+</div>
+
+<!-- Top status bar -->
+<div class="border-b border-amber-900/40 bg-black/70 backdrop-blur sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-[11px] font-mono text-amber-500/80">
+    <div class="flex items-center gap-3">
+      <span class="w-2 h-2 bg-red-500 rounded-full pulse-warn"></span>
+      <span class="blink text-red-400">●REC</span>
+      <span class="hidden sm:inline">SISTEM: KOMANDO PUSAT // TERMINAL OTH-77</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span id="clock">--:--:--</span>
+      <span class="hidden sm:inline">UTC+07</span>
+      <span class="hidden md:inline">SESS:0x8F-22A1</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="relative max-w-7xl mx-auto px-6 py-12 md:py-20">
+  <div class="grid md:grid-cols-12 gap-6 items-end">
+    <div class="md:col-span-8">
+      <div class="flex items-center gap-3 text-amber-500/70 text-xs font-mono mb-4">
+        <span>DOSIR No.</span>
+        <span class="text-amber-400">2024-KE-0069</span>
+        <span class="opacity-50">|</span>
+        <span>REVISI: 0.6.9</span>
+        <span class="opacity-50">|</span>
+        <span class="text-red-400">STATUS: AKTIF</span>
+      </div>
+      <h1 class="font-display text-5xl md:text-7xl lg:text-8xl text-amber-50 leading-[0.95] mb-4 glitch">
+        KODE ETIK<br>
+        <span class="text-amber-500">MILITER</span>
+      </h1>
+      <div class="font-mono text-amber-400/80 text-sm md:text-base mb-6 max-w-xl">
+        <span class="text-amber-500">&gt;</span> <span id="typewriter"></span><span class="blink">_</span>
+      </div>
+      <p class="font-oswald text-stone-400 text-lg md:text-xl leading-relaxed max-w-2xl">
+        Doktrin dua-tingkat untuk personel lapangan dan struktur komando strategis.
+        Berlaku efektif sejak <span class="text-amber-400">06.00 UTC</span>. Pelanggaran
+        dikenai sanksi militer tanpa peradilan sipil.
+      </p>
+    </div>
+    <div class="md:col-span-4 space-y-3">
+      <div class="border border-amber-900/50 p-4 bg-black/50 relative corner-brackets">
+        <div class="text-[10px] text-amber-500/60 font-mono mb-1">OTORISASI</div>
+        <div class="font-oswald text-stone-100 text-lg">JENDERAL KOMANDO</div>
+        <div class="text-stone-500 text-xs font-mono mt-1">ID: KOMANDO-09-ALPHA</div>
+      </div>
+      <div class="border border-red-900/50 p-4 bg-black/50 relative corner-brackets">
+        <div class="text-[10px] text-red-500/60 font-mono mb-1">KLASIFIKASI</div>
+        <div class="font-oswald text-red-400 text-lg">RAHASIA NEGARA</div>
+        <div class="text-stone-500 text-xs font-mono mt-1">CLEARED: LEVEL-7</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two protocol cards -->
+  <div class="grid md:grid-cols-2 gap-px mt-12 bg-amber-900/20 border border-amber-900/40">
+    <div class="bg-black/60 p-6 md:p-8 relative">
+      <div class="flex items-start justify-between mb-6">
+        <div>
+          <div class="text-xs text-stone-500 font-mono">PROTOKOL</div>
+          <div class="font-display text-5xl md:text-6xl text-amber-500">0.0.6</div>
+        </div>
+        <div class="text-right text-xs font-mono text-stone-400">
+          <div>SKALA: RENDAH</div>
+          <div class="text-amber-500">TINGKAT: TAKTIS</div>
+        </div>
+      </div>
+      <div class="font-oswald text-stone-100 text-xl mb-2">Etika Personel Lapangan</div>
+      <p class="text-stone-400 text-sm">Berlaku untuk: Prajurit, Sersan, Komandan regu, unit taktis kecil.</p>
+      <div class="mt-6 flex gap-4 text-xs font-mono">
+        <div><span class="text-amber-500 text-base">6</span> <span class="text-stone-500">PASAL</span></div>
+        <div><span class="text-amber-500 text-base">42</span> <span class="text-stone-500">BUTIR</span></div>
+        <div><span class="text-red-400 text-base">III</span> <span class="text-stone-500">SANKSI</span></div>
+      </div>
+    </div>
+    <div class="bg-black/60 p-6 md:p-8 relative border-l-2 border-red-500">
+      <div class="flex items-start justify-between mb-6">
+        <div>
+          <div class="text-xs text-stone-500 font-mono">PROTOKOL</div>
+          <div class="font-display text-5xl md:text-6xl text-red-500">0.6.9</div>
+        </div>
+        <div class="text-right text-xs font-mono text-stone-400">
+          <div>SKALA: TINGGI</div>
+          <div class="text-red-500">TINGKAT: STRATEGIS</div>
+        </div>
+      </div>
+      <div class="font-oswald text-stone-100 text-xl mb-2">Etika Komando Strategis</div>
+      <p class="text-stone-400 text-sm">Berlaku untuk: Perwira tinggi, Komandan operasi, Dewan militer.</p>
+      <div class="mt-6 flex gap-4 text-xs font-mono">
+        <div><span class="text-red-500 text-base">9</span> <span class="text-stone-500">PASAL</span></div>
+        <div><span class="text-red-500 text-base">81</span> <span class="text-stone-500">BUTIR</span></div>
+        <div><span class="text-red-400 text-base">VII</span> <span class="text-stone-500">SANKSI</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PROTOCOL 0.0.6 -->
+<section class="relative max-w-7xl mx-auto px-6 py-16 md:py-24">
+  <div class="flex items-center gap-4 mb-12">
+    <div class="font-display text-7xl md:text-9xl text-amber-500/10 leading-none">0.0.6</div>
+    <div class="flex-1 border-t border-amber-900/40"></div>
+    <div class="text-right text-xs font-mono text-stone-500">
+      <div>DOKTRIN TAKTIS</div>
+      <div class="text-amber-500">TINGKAT I — RENDAH</div>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-8 md:gap-12">
+    <div class="md:col-span-1">
+      <div class="sticky top-24">
+        <div class="text-amber-500 text-xs font-mono mb-2">■ PASAL TAKTIS</div>
+        <h2 class="font-display text-3xl md:text-4xl text-amber-50 mb-4">
+          Etika<br>Lapangan
+        </h2>
+        <p class="text-stone-400 text-sm leading-relaxed mb-6">
+          Protokol 0.0.6 mengatur perilaku personel pada level unit kecil.
+          Dirancang untuk eksekusi cepat di teater operasi langsung. Pelanggaran
+          ditangani oleh pengadilan militer lapangan.
+        </p>
+        <div class="space-y-2 text-xs font-mono">
+          <div class="flex justify-between border-b border-amber-900/20 py-1">
+            <span class="text-stone-500">YURISDIKSI</span><span class="text-amber-500">UNIT — REGU</span>
+          </div>
+          <div class="flex justify-between border-b border-amber-900/20 py-1">
+            <span class="text-stone-500">RESPON</span><span class="text-amber-500">&lt; 6 JAM</span>
+          </div>
+          <div class="flex justify-between border-b border-amber-900/20 py-1">
+            <span class="text-stone-500">OTORITAS</span><span class="text-amber-500">KOMANDAN REGU</span>
+          </div>
+          <div class="flex justify-between border-b border-amber-900/20 py-1">
+            <span class="text-stone-500">SANKSI MAKS</span><span class="text-red-400">DEMI-II</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="md:col-span-2 space-y-3">
+      <article class="article p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-amber-500/70 w-12">01</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Kepatuhan Rantai Komando</h3>
+            <p class="text-stone-400 text-sm">Prajurit wajib tunduk pada perintah langsung atasan tanpa penundaan. Penolakan atas perintah sah dicatat sebagai insiden 0.0.6-A1.</p>
+            <div class="mt-2 text-[10px] font-mono text-amber-500/60">REF: KE-006-A1 // SANKSI: REPRIMAND → DEMI-I</div>
+          </div>
+        </div>
+      </article>
+      <article class="article p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-amber-500/70 w-12">02</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Proporsionalitas Kekuatan</h3>
+            <p class="text-stone-400 text-sm">Penggunaan senjata harus proporsional terhadap ancaman. Eskalasi paksa melebihi level ancaman dikategorikan pelanggaran berat.</p>
+            <div class="mt-2 text-[10px] font-mono text-amber-500/60">REF: KE-006-A2 // SANKSI: DEMI-II → PENJARA MILITER</div>
+          </div>
+        </div>
+      </article>
+      <article class="article p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-amber-500/70 w-12">03</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Perlindungan Non-Kombatan</h3>
+            <p class="text-stone-400 text-sm">Warga sipil, fasilitas medis, dan infrastruktur sipil wajib dilindungi. Pelanggaran dapat diekstradisi ke yurisdiksi internasional.</p>
+            <div class="mt-2 text-[10px] font-mono text-amber-500/60">REF: KE-006-A3 // SANKSI: DEMI-III → PEMBERHENTIAN</div>
+          </div>
+        </div>
+      </article>
+      <article class="article p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-amber-500/70 w-12">04</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Pelaporan Insiden Terjadwal</h3>
+            <p class="text-stone-400 text-sm">Setiap insiden operasional wajib dilaporkan dalam 6 jam. Keterlambatan tanpa alasan sah menyebabkan eskalasi sanksi otomatis.</p>
+            <div class="mt-2 text-[10px] font-mono text-amber-500/60">REF: KE-006-A4 // SANKSI: REPRIMAND → DEMI-I</div>
+          </div>
+        </div>
+      </article>
+      <article class="article p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-amber-500/70 w-12">05</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Kerahasiaan Taktis</h3>
+            <p class="text-stone-400 text-sm">Informasi posisi, kekuatan, dan rencana unit tingkat rahasia. Komunikasi via kanal terenkripsi yang ditentukan komandan.</p>
+            <div class="mt-2 text-[10px] font-mono text-amber-500/60">REF: KE-006-A5 // SANKSI: DEMI-II → PENJARA MILITER</div>
+          </div>
+        </div>
+      </article>
+      <article class="article p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-amber-500/70 w-12">06</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Larangan Kontak Tak Terverifikasi</h3>
+            <p class="text-stone-400 text-sm">Prajurit dilarang berkomunikasi dengan pihak tak teridentifikasi di teater operasi. Pelaporan kontak wajib dalam 1 jam.</p>
+            <div class="mt-2 text-[10px] font-mono text-amber-500/60">REF: KE-006-A6 // SANKSI: DEMI-I → DEMI-II</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Separator with classification -->
+<div class="max-w-7xl mx-auto px-6 my-8">
+  <div class="flex items-center gap-4 text-amber-500/40 text-xs font-mono">
+    <div class="flex-1 border-t border-dashed border-amber-900/40"></div>
+    <span>■ ESKALASI: TAKTIS → STRATEGIS ■</span>
+    <div class="flex-1 border-t border-dashed border-amber-900/40"></div>
+  </div>
+</div>
+
+<!-- PROTOCOL 0.6.9 -->
+<section class="relative max-w-7xl mx-auto px-6 py-16 md:py-24">
+  <div class="flex items-center gap-4 mb-12">
+    <div class="text-left text-xs font-mono text-stone-500">
+      <div>DOKTRIN STRATEGIS</div>
+      <div class="text-red-500">TINGKAT II — TINGGI</div>
+    </div>
+    <div class="flex-1 border-t border-red-900/40"></div>
+    <div class="font-display text-7xl md:text-9xl text-red-500/10 leading-none">0.6.9</div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-8 md:gap-12">
+    <div class="md:col-span-2 space-y-3 order-2 md:order-1">
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">01</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Otoritas Strategis Lintas-Distrik</h3>
+            <p class="text-stone-400 text-sm">Komandan strategis berwenang mengkoordinir operasi lintas distrik militer tanpa persetujuan dewan pada kondisi darurat tersertifikasi.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S1 // SANKSI: PEMECATAN → PENGADILAN TINGGI</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">02</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Penilaian Risiko Operasional Skala Besar</h3>
+            <p class="text-stone-400 text-sm">Setiap operasi skala besar wajib memiliki dokumen penilaian risiko yang ditandatangani komandan dan perwira intelijen senior.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S2 // SANKSI: SKORS → AUDIT DEWAN</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">03</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Aktivasi Protokol Darurat Tertinggi</h3>
+            <p class="text-stone-400 text-sm">Hanya komandan strategis yang dapat mengaktifkan protokol darurat level DELTA. Aktivasi palsu dikategorikan pengkhianatan militer.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S3 // SANKSI: PENGADILAN TINGGI → TINGGI-AGUNG</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">04</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Komando Gabungan Lintas-Angkatan</h3>
+            <p class="text-stone-400 text-sm">Operasi gabungan darat-udara-laut wajib memiliki rantai komando tunggal yang disepakati sebelum aktivasi. Ambiguitas komando dilarang.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S4 // SANKSI: SKORS → PEMINDAHAN KOMANDO</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">05</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Pengelolaan Aset Kritis & Senjata Strategis</h3>
+            <p class="text-stone-400 text-sm">Aset kritis dan senjata strategis hanya dapat diaktivasi oleh dual-key: komandan strategis + perwira otorisasi pusat. Tidak ada aktivasi tunggal.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S5 // SANKSI: TINGGI-AGUNG → MAKSI</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">06</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Hubungan dengan Otoritas Sipil & Internasional</h3>
+            <p class="text-stone-400 text-sm">Perwira strategis wajib menghormati otoritas sipil yang sah dan hukum internasional yang telah diratifikasi. Penolakan atas perintah ilegal wajib dicatat.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S6 // SANKSI: AUDIT → PEMECATAN</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">07</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Akuntabilitas Strategis & Audit Komando</h3>
+            <p class="text-stone-400 text-sm">Setiap keputusan strategis wajib terdokumentasi dalam log komando terenkripsi. Audit triwulanan dilakukan oleh dewan inspektur jenderal.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S7 // SANKSI: REPRIMAND PUBBLIK → SKORS</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">08</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Deklasifikasi & Dokumentasi Operasi</h3>
+            <p class="text-stone-400 text-sm">Operasi strategis wajib didokumentasikan penuh. Deklasifikasi diajukan setelah 25 tahun atau oleh perintah dewan militer tinggi.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S8 // SANKSI: SKORS → PENGADILAN TINGGI</div>
+          </div>
+        </div>
+      </article>
+      <article class="article red p-5">
+        <div class="flex items-start gap-4">
+          <div class="font-display text-2xl text-red-500/70 w-12">09</div>
+          <div class="flex-1">
+            <h3 class="font-oswald text-lg text-stone-100 mb-1">Protokol Suksesi Kepemimpinan</h3>
+            <p class="text-stone-400 text-sm">Pada kehilangan komandan strategis, suksesi otomatis mengikuti urutan tertentu yang ditetapkan dewan. Tidak boleh ada vacuum komando lebih dari 90 detik.</p>
+            <div class="mt-2 text-[10px] font-mono text-red-400/60">REF: KE-069-S9 // SANKSI: TINGGI-AGUNG</div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="md:col-span-1 order-1 md:order-2">
+      <div class="sticky top-24">
+        <div class="text-red-500 text-xs font-mono mb-2">■ PASAL STRATEGIS</div>
+        <h2 class="font-display text-3xl md:text-4xl text-red-50 mb-4">
+          Etika<br>Komando
+        </h2>
+        <p class="text-stone-400 text-sm leading-relaxed mb-6">
+          Protokol 0.6.9 mengatur perilaku perwira tinggi dan struktur komando strategis.
+          Mencakup keputusan operasi skala besar, aset kritis, dan hubungan lintas-yurisdiksi.
+        </p>
+        <div class="space-y-2 text-xs font-mono">
+          <div class="flex justify-between border-b border-red-900/20 py-1">
+            <span class="text-stone-500">YURISDIKSI</span><span class="text-red-500">TEATER — NASIONAL</span>
+          </div>
+          <div class="flex justify-between border-b border-red-900/20 py-1">
+            <span class="text-stone-500">RESPON</span><span class="text-red-500">REAL-TIME</span>
+          </div>
+          <div class="flex justify-between border-b border-red-900/20 py-1">
+            <span class="text-stone-500">OTORITAS</span><span class="text-red-500">DEWAN MILITER</span>
+          </div>
+          <div class="flex justify-between border-b border-red-900/20 py-1">
+            <span class="text-stone-500">SANKSI MAKS</span><span class="text-red-400">TINGGI-AGUNG</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Hierarchy visualization -->
+<section class="max-w-7xl mx-auto px-6 py-16 md:py-24">
+  <div class="text-center mb-12">
+    <div class="text-amber-500/60 text-xs font-mono">■ VISUALISASI HIERARKI</div>
+    <h2 class="font-display text-3xl md:text-5xl text-amber-50 mt-2">STRUKTUR ESKALASI</h2>
+    <p class="text-stone-400 text-sm mt-3 max-w-2xl mx-auto">Diagram komando menunjukkan cakupan yurisdiksi dan tingkat eskalasi kedua protokol.</p>
+  </div>
+
+  <div class="relative max-w-4xl mx-auto py-8">
+    <!-- SVG Radar -->
+    <svg viewBox="0 0 600 600" class="w-full max-w-xl mx-auto block">
+      <!-- outermost ring (0.6.9) -->
+      <circle cx="300" cy="300" r="270" fill="none" stroke="rgba(255,45,45,0.25)" stroke-width="1" stroke-dasharray="4 4"/>
+      <circle cx="300" cy="300" r="270" fill="none" stroke="rgba(255,45,45,0.5)" stroke-width="1.5" class="ring-pulse"/>
+      <text x="300" y="40" text-anchor="middle" fill="#ff2d2d" font-family="JetBrains Mono" font-size="11" font-weight="700">0.6.9 — STRATEGIS</text>
+      <text x="300" y="56" text-anchor="middle" fill="#8a8170" font-family="JetBrains Mono" font-size="9">RADIUS: NASIONAL</text>
+
+      <!-- middle ring -->
+      <circle cx="300" cy="300" r="180" fill="none" stroke="rgba(255,180,0,0.2)" stroke-width="1" stroke-dasharray="2 2"/>
+
+      <!-- inner ring (0.0.6) -->
+      <circle cx="300" cy="300" r="100" fill="none" stroke="rgba(255,180,0,0.5)" stroke-width="1.5"/>
+      <circle cx="300" cy="300" r="100" fill="rgba(255,180,0,0.04)"/>
+      <text x="300" y="200" text-anchor="middle" fill="#ffb400" font-family="JetBrains Mono" font-size="11" font-weight="700">0.0.6 — TAKTIS</text>
+      <text x="300" y="216" text-anchor="middle" fill="#8a8170" font-family="JetBrains Mono" font-size="9">RADIUS: UNIT</text>
+
+      <!-- center -->
+      <circle cx="300" cy="300" r="6" fill="#ffb400"/>
+      <circle cx="300" cy="300" r="14" fill="none" stroke="#ffb400" stroke-width="1"/>
+
+      <!-- crosshair -->
+      <line x1="300" y1="20" x2="300" y2="580" stroke="rgba(255,180,0,0.08)" stroke-width="1"/>
+      <line x1="20" y1="300" x2="580" y2="300" stroke="rgba(255,180,0,0.08)" stroke-width="1"/>
+
+      <!-- tick marks -->
+      <g stroke="rgba(255,180,0,0.4)" stroke-width="1">
+        <line x1="300" y1="25" x2="300" y2="35"/>
+        <line x1="300" y1="565" x2="300" y2="575"/>
+        <line x1="25" y1="300" x2="35" y2="300"/>
+        <line x1="565" y1="300" x2="575" y2="300"/>
+      </g>
+
+      <!-- radar sweep -->
+      <g class="radar-sweep" style="transform-origin: 300px 300px;">
+        <defs>
+          <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(255,180,0,0)"/>
+            <stop offset="100%" stop-color="rgba(255,180,0,0.25)"/>
+          </linearGradient>
+        </defs>
+        <path d="M 300 300 L 570 300 A 270 270 0 0 0 470 86 Z" fill="url(#sweep)"/>
+      </g>
+
+      <!-- markers -->
+      <g>
+        <circle cx="220" cy="250" r="3" fill="#ffb400"/>
+        <text x="210" y="240" fill="#ffb400" font-family="JetBrains Mono" font-size="8">UNIT-A</text>
+        <circle cx="370" cy="320" r="3" fill="#ffb400"/>
+        <text x="360" y="312" fill="#ffb400" font-family="JetBrains Mono" font-size="8">UNIT-B</text>
+        <circle cx="450" cy="180" r="3" fill="#ff2d2d"/>
+        <text x="440" y="172" fill="#ff2d2d" font-family="JetBrains Mono" font-size="8">KOMANDO-1</text>
+        <circle cx="150" cy="420" r="3" fill="#ff2d2d"/>
+        <text x="138" y="412" fill="#ff2d2d" font-family="JetBrains Mono" font-size="8">KOMANDO-2</text>
+      </g>
+    </svg>
+
+    <!-- Legend below -->
+    <div class="grid grid-cols-2 gap-4 mt-8 max-w-xl mx-auto text-xs font-mono">
+      <div class="border border-amber-900/40 p-3 bg-black/40">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+          <span class="text-amber-500">0.0.6</span>
+        </div>
+        <div class="text-stone-400 text-[10px]">Cakupan taktis — regu hingga kompi. Radius efektif &lt; 50 km.</div>
+      </div>
+      <div class="border border-red-900/40 p-3 bg-black/40">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+          <span class="text-red-500">0.6.9</span>
+        </div>
+        <div class="text-stone-400 text-[10px]">Cakupan strategis — teater hingga nasional. Radius tak terbatas.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison matrix -->
+<section class="max-w-7xl mx-auto px-6 py-16 md:py-24">
+  <div class="text-center mb-12">
+    <div class="text-amber-500/60 text-xs font-mono">■ MATRIKS PERBANDINGAN</div>
+    <h2 class="font-display text-3xl md:text-5xl text-amber-50 mt-2">DIMENSI PROTOKOL</h2>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full border border-amber-900/40 text-sm" style="border-collapse: collapse;">
+      <thead class="bg-black/60">
+        <tr class="text-left font-mono text-xs">
+          <th class="p-3 text-stone-500 border-b border-amber-900/40">DIMENSI</th>
+          <th class="p-3 text-amber-500 border-b border-amber-900/40 border-l border-amber-900/20">0.0.6 — TAKTIS</th>
+          <th class="p-3 text-red-500 border-b border-amber-900/40 border-l border-red-900/20">0.6.9 — STRATEGIS</th>
+        </tr>
+      </thead>
+      <tbody class="font-mono text-stone-300 text-xs md:text-sm">
+        <tr class="row-hover border-b border-amber-900/20">
+          <td class="p-3 text-stone-500">YURISDIKSI</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">Unit / Regu / Kompi</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Teater / Nasional / Gabungan</td>
+        </tr>
+        <tr class="row-hover border-b border-amber-900/20">
+          <td class="p-3 text-stone-500">PERSONEL</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">Prajurit — Sersan</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Letnan — Jenderal</td>
+        </tr>
+        <tr class="row-hover border-b border-amber-900/20">
+          <td class="p-3 text-stone-500">ASET</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">Standar — ringan</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Kritis — senjata strategis</td>
+        </tr>
+        <tr class="row-hover border-b border-amber-900/20">
+          <td class="p-3 text-stone-500">RESPON</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">&lt; 6 jam</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Real-time (menit)</td>
+        </tr>
+        <tr class="row-hover border-b border-amber-900/20">
+          <td class="p-3 text-stone-500">OTORITAS</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">Komandan Regu</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Dewan Militer / Komando Pusat</td>
+        </tr>
+        <tr class="row-hover border-b border-amber-900/20">
+          <td class="p-3 text-stone-500">PENGADILAN</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">Militer Lapangan</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Pengadilan Tinggi — Agung</td>
+        </tr>
+        <tr class="row-hover border-b border-amber-900/20">
+          <td class="p-3 text-stone-500">SANKSI MAKS</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">Demi-II / Penjara militer</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Pemberhentian total / tinggi-agung</td>
+        </tr>
+        <tr class="row-hover">
+          <td class="p-3 text-stone-500">DURASI DOKTRIN</td>
+          <td class="p-3 text-amber-500/90 border-l border-amber-900/20">Operasi harian</td>
+          <td class="p-3 text-red-500/90 border-l border-red-900/20">Operasi tersertifikasi</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Footer / authorization -->
+<footer class="border-t border-amber-900/40 mt-12 relative">
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="grid md:grid-cols-12 gap-8 items-center">
+      <div class="md:col-span-6">
+        <div class="text-amber-500/60 text-xs font-mono mb-2">■ OTORISASI DOSIR</div>
+        <p class="text-stone-400 text-sm leading-relaxed">
+          Dosir ini disahkan oleh Komando Pusat Militer dan terdaftar pada arsip
+          strategis nomor <span class="text-amber-400">2024-KE-0069</span>. Salinan
+          fisik hanya tersedia di ruang aman level-7. Pelanggaran distribusi dikenai
+          sanksi pidana militer sesuai pasal 0.6.9-S8.
+        </p>
+      </div>
+      <div class="md:col-span-3">
+        <div class="text-amber-500/60 text-xs font-mono mb-2">DITERBITKAN OLEH</div>
+        <div class="font-oswald text-stone-100 text-lg">JENDERAL KOMANDO</div>
+        <div class="text-stone-500 text-xs font-mono mt-1">Tanda tangan elektronik sah</div>
+        <div class="text-amber-500/80 text-[10px] font-mono mt-3">[SIG: 9F:4A:21:EE:77:0D]</div>
+      </div>
+      <div class="md:col-span-3 flex justify-center md:justify-end">
+        <div class="stamp font-display text-xl px-6 py-3 text-center">
+          SAH<br>
+          <span class="text-xs font-mono">06.06.2024</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 pt-6 border-t border-amber-900/20 flex flex-col md:flex-row justify-between gap-4 text-[10px] font-mono text-stone-500">
+      <div>
+        © KOMANDO PUSAT — ARSIP STRATEGIS // DOKUMEN RESMI
+      </div>
+      <div class="flex gap-4">
+        <span>VER: 0.6.9</span>
+        <span>BUILD: 2024.06.06</span>
+        <span class="text-amber-500">END OF FILE</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="classified-bar text-black text-center py-1.5 font-mono text-xs font-bold tracking-widest flicker">
+    ⚠ RAHASIA — TERKLASIFIKASI — TIDAK UNTUK DISTRIBUSI UMUM ⚠
+  </div>
+</footer>
+
+<script>
+// Live clock
+function updateClock() {
+  const d = new Date();
+  const el = document.getElementById('clock');
+  if (el) el.textContent = d.toLocaleTimeString('en-GB', { hour12: false });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Typewriter terminal boot
+const tw = document.getElementById('typewriter');
+const messages = [
+  'Memuat doktrin komando...',
+  'Verifikasi sidik jari biometrik...',
+  'Akses dosir: DIBERIKAN',
+  'Inisialisasi protokol 0.0.6 dan 0.6.9...'
+];
+let mIdx = 0, cIdx = 0;
+function typeWriter() {
+  const msg = messages[mIdx];
+  if (cIdx <= msg.length) {
+    tw.textContent = msg.slice(0, cIdx);
+    cIdx++;
+    setTimeout(typeWriter, 40 + Math.random() * 60);
+  } else {
+    setTimeout(() => {
+      cIdx = 0;
+      mIdx = (mIdx + 1) % messages.length;
+      tw.textContent = '';
+      typeWriter();
+    }, 2200);
+  }
+}
+typeWriter();
+
+// Reveal on scroll
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('article.article').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = `opacity 0.5s ease ${i * 0.05}s, transform 0.5s ease ${i * 0.05}s, border-color 0.35s ease`;
+  io.observe(el);
+});
+</script>
+</body>
+</html>
